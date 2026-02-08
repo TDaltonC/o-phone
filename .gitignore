@@ -11,3 +11,6 @@ wheels/
 
 # Environment
 .env
+
+# GCP credentials
+service-account.json
