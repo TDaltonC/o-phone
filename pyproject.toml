@@ -1,10 +1,12 @@
 [project]
-name = "o-phone"
+name = "the-answering-machine"
 version = "0.1.0"
-description = "Add your description here"
+description = "A multi-agent system that talks to kids, finds them library books, and keeps parents in the loop"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "browser-use>=0.11.9",
+    "google-cloud-firestore>=2.19.0",
     "python-dotenv>=1.2.1",
+    "requests>=2.31.0",
 ]

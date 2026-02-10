@@ -3,18 +3,14 @@ import re
 
 import requests
 from dotenv import load_dotenv
-from google.cloud import firestore
+
+from config import load_family
+from firestore_client import get_db
 
 load_dotenv()
 
-os.environ.setdefault(
-    "GOOGLE_APPLICATION_CREDENTIALS",
-    os.path.join(os.path.dirname(__file__), "service-account.json"),
-)
-
 CARTESIA_API_KEY = os.environ["CARTESIA_API_KEY"]
 CARTESIA_AGENT_ID = os.environ["CARTESIA_AGENT_ID"]
-PHONE_NUMBER = os.environ["PHONE_NUMBER"]
 
 CARTESIA_URL = "https://api.cartesia.ai/twilio/call/outbound"
 
@@ -62,19 +58,20 @@ def format_books_context(books: list[dict]) -> str:
 
 def write_to_firestore(phone_number: str, books_context: str) -> None:
     """Write book context to Firestore so the voice agent can read it."""
-    db = firestore.Client(project="o-phone-c0b25")
+    from google.cloud import firestore as fs
+    db = get_db()
     db.collection("pending_calls").document(phone_number).set({
         "books_context": books_context,
-        "created_at": firestore.SERVER_TIMESTAMP,
+        "created_at": fs.SERVER_TIMESTAMP,
     })
     print(f"Book context written to Firestore: pending_calls/{phone_number}")
 
 
-def trigger_call(books: list[dict]) -> None:
+def trigger_call(books: list[dict], phone_number: str) -> None:
     """Write context to Firestore, then POST to Cartesia outbound call API."""
     books_context = format_books_context(books)
 
-    write_to_firestore(PHONE_NUMBER, books_context)
+    write_to_firestore(phone_number, books_context)
 
     headers = {
         "X-API-Key": CARTESIA_API_KEY,
@@ -82,7 +79,7 @@ def trigger_call(books: list[dict]) -> None:
         "Content-Type": "application/json",
     }
     body = {
-        "target_numbers": [PHONE_NUMBER],
+        "target_numbers": [phone_number],
         "agent_id": CARTESIA_AGENT_ID,
     }
     resp = requests.post(CARTESIA_URL, headers=headers, json=body)
@@ -92,6 +89,9 @@ def trigger_call(books: list[dict]) -> None:
 
 
 def main():
+    family = load_family()
+    phone_number = family["phone_number"]
+
     books = parse_holds_md()
     if not books:
         print("No books are ready for pickup. No call needed.")
@@ -101,7 +101,7 @@ def main():
     for b in books:
         print(f'  - "{b["title"]}" by {b["author"]} at {b["branch"]}')
 
-    trigger_call(books)
+    trigger_call(books, phone_number)
 
 
 if __name__ == "__main__":

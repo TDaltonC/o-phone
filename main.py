@@ -6,12 +6,15 @@ from browser_use import Agent, Browser
 from browser_use.llm import ChatAnthropic
 from dotenv import load_dotenv
 
-from interests import load_interests
+from config import load_family
 
 load_dotenv()
 
 
-def build_task(persona: str, summaries: list[str]) -> str:
+def build_task(family: dict, summaries: list[str]) -> str:
+    child = family["child_name"]
+    age = family["child_age"]
+    persona = f"{age}-year-old boy, showing signs of being nerdy"
     summary_block = "\n".join(f"  - {s}" for s in summaries)
     return f"""\
 You are a children's librarian helping pick books for a kid.
@@ -70,9 +73,34 @@ def save_picks(result) -> None:
     print("\nPicks saved to picks.json")
 
 
+def load_summaries(family_id: str) -> list[str]:
+    """Load summaries from Firestore, falling back to interests.py test data."""
+    try:
+        from firestore_client import get_db
+        db = get_db()
+        docs = (
+            db.collection("families")
+            .document(family_id)
+            .collection("summaries")
+            .order_by("created_at", direction="DESCENDING")
+            .limit(5)
+            .stream()
+        )
+        summaries = [doc.to_dict().get("summary_text", "") for doc in docs]
+        if summaries:
+            return summaries
+    except Exception:
+        pass
+
+    # Fall back to synthetic test data
+    from interests import load_interests
+    return load_interests()["summaries"]
+
+
 async def main():
-    interests = load_interests()
-    task = build_task(interests["persona"], interests["summaries"])
+    family = load_family()
+    summaries = load_summaries(family.get("family_id", "leo"))
+    task = build_task(family, summaries)
 
     browser = Browser()
     llm = ChatAnthropic(model="claude-sonnet-4-5-20250929")

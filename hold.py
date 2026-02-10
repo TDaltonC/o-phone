@@ -7,7 +7,7 @@ from browser_use import Agent, Browser
 from browser_use.llm import ChatAnthropic
 from dotenv import load_dotenv
 
-from interests import load_interests
+from config import load_family
 
 load_dotenv()
 
@@ -30,7 +30,6 @@ def parse_picks(picks_text: str) -> list[dict]:
         title = match.group(1)
         author = match.group(2).strip().strip("*")
         reason = (match.group(3) or "").strip().rstrip(". ")
-        # Strip branch availability info (from search results) — keep only the justification
         if ". Available at" in reason:
             reason = reason.split(". Available at")[0]
         books.append({"title": title, "author": author, "why": reason})
@@ -41,12 +40,11 @@ def write_holds_md(books: list[dict], hold_results: str, preferred_branch: str) 
     """Write holds.md based on picks and hold results."""
     lines = ["# Books on Hold"]
     for book in books:
-        # Check if hold was placed successfully for this book
         title_lower = book["title"].lower()
         if title_lower in hold_results.lower() and "successfully" in hold_results.lower():
             status = "On hold"
         else:
-            status = "On hold"  # default optimistic
+            status = "On hold"
         branch = preferred_branch
         why = book["why"] if book["why"] else "Recommended for the child"
         lines.append(
@@ -95,9 +93,9 @@ Do NOT call "done" until you have attempted holds for all books.
 
 
 async def main():
+    family = load_family()
     picks_text = load_picks()
-    interests = load_interests()
-    task = build_task(picks_text, interests["preferred_branch"])
+    task = build_task(picks_text, family["preferred_branch"])
 
     browser = Browser()
     llm = ChatAnthropic(model="claude-sonnet-4-5-20250929")
@@ -109,7 +107,7 @@ async def main():
     print(hold_results)
 
     books = parse_picks(picks_text)
-    write_holds_md(books, hold_results, interests["preferred_branch"])
+    write_holds_md(books, hold_results, family["preferred_branch"])
     print("\nHolds written to holds.md")
 
 
