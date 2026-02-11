@@ -48,22 +48,24 @@ def format_books_context(books: list[dict]) -> str:
     )
 
 
-def write_to_firestore(phone_number: str, books_context: str) -> None:
-    """Write book context to Firestore so the voice agent can read it."""
+def write_to_firestore(phone_number: str, books_context: str, parent_name: str, child_name: str) -> None:
+    """Write book context and family names to Firestore so the voice agent can read it."""
     from google.cloud import firestore as fs
     db = get_db()
     db.collection("pending_calls").document(phone_number).set({
         "books_context": books_context,
+        "parent_name": parent_name,
+        "child_name": child_name,
         "created_at": fs.SERVER_TIMESTAMP,
     })
     print(f"Book context written to Firestore: pending_calls/{phone_number}")
 
 
-def trigger_call(books: list[dict], phone_number: str) -> None:
+def trigger_call(books: list[dict], phone_number: str, parent_name: str, child_name: str) -> None:
     """Write context to Firestore, then POST to Cartesia outbound call API."""
     books_context = format_books_context(books)
 
-    write_to_firestore(phone_number, books_context)
+    write_to_firestore(phone_number, books_context, parent_name, child_name)
 
     headers = {
         "X-API-Key": CARTESIA_API_KEY,
@@ -84,6 +86,8 @@ def main():
     family = load_family()
     family_id = family.get("family_id", "leo")
     phone_number = family["phone_number"]
+    parent_name = family["parent_name"]
+    child_name = family["child_name"]
 
     books = load_ready_books(family_id)
     if not books:
@@ -94,7 +98,7 @@ def main():
     for b in books:
         print(f'  - "{b["title"]}" by {b["author"]}')
 
-    trigger_call(books, phone_number)
+    trigger_call(books, phone_number, parent_name, child_name)
 
 
 if __name__ == "__main__":
