@@ -298,13 +298,32 @@
             margin: 1.5rem 0 2rem;
         }
 
-        /* ---- BUTTERFLY IMAGE ---- */
+        /* ---- BUTTERFLY + QUOTE SIDE-BY-SIDE ---- */
+
+        .article blockquote.has-image {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
 
         .butterfly-img {
-            display: block;
-            max-width: 280px;
-            margin: 1.25rem auto;
+            flex-shrink: 0;
+            width: 160px;
             border-radius: 12px;
+        }
+
+        .article blockquote.has-image .quote-text {
+            flex: 1;
+        }
+
+        @media (max-width: 640px) {
+            .article blockquote.has-image {
+                flex-direction: column;
+            }
+
+            .butterfly-img {
+                width: 120px;
+            }
         }
 
         /* ---- HORIZONTAL RULE ---- */
@@ -392,7 +411,7 @@
         </div>
 
         <p class="summary">
-            Over a <a href="https://cerebralvalley.ai/e/cartesia-voice-agents-hackathon">weekend hackathon</a>, I built a hardware + software voice-AI experience for curiosity-driven families. Afterwards, I solo-implemented a tighter version integrating lessons learned.
+            Over a <a href="https://cerebralvalley.ai/e/cartesia-voice-agents-hackathon">weekend hackathon</a>, I built a hardware + software voice-AI experience for curiosity-driven families. Afterwards, I solo-implemented a tighter version integrating lessons learned.<br><br>
             <a href="https://github.com/TDaltonC/the-answering-machine">GitHub</a>
         </p>
     </header>
@@ -414,9 +433,12 @@
 
         <p class="fade-in">That question contains the seed of chemistry, material science, civil engineering, and urban planning. Not as school subjects, but as a single thread of wonder. If you follow it, it branches. If you let it lead, it takes you somewhere nobody could have predicted. Kenneth Stanley and Joel Lehman call this the power of non-objective search — the insight that the most interesting discoveries happen not when you're optimizing toward a predefined goal, but when you're following what's interesting and seeing where it leads.</p>
 
-        <blockquote class="fade-in">
-            <p>"You can go treasure hunting by following your instinct for the interesting, not because you know where you're going, but because you feel the potential in where you are right now."</p>
-            <span class="attribution">— Kenneth Stanley &amp; Joel Lehman, <em>Why Greatness Cannot Be Planned</em></span>
+        <blockquote class="fade-in has-image">
+            <img class="butterfly-img" src="butterfly.jpg" alt="The Picbreeder butterfly — an image that emerged from non-objective collaborative evolution">
+            <div class="quote-text">
+                <p>"You can go treasure hunting by following your instinct for the interesting, not because you know where you're going, but because you feel the potential in where you are right now."</p>
+                <span class="attribution">— Kenneth Stanley &amp; Joel Lehman, <a href="https://www.goodreads.com/book/show/25670869-why-greatness-cannot-be-planned" target="_blank" rel="noopener noreferrer"><em>Why Greatness Cannot Be Planned</em></a></span>
+            </div>
         </blockquote>
 
         <p class="fade-in">Meanwhile, the internet is the greatest library ever assembled. Somewhere in it is a children's book about how buildings are built. A city website listing active construction permits. A weather forecast showing sun on Thursday. A map that puts the library and the construction site two blocks apart.</p>
@@ -478,11 +500,12 @@
 
         <p class="fade-in">The parent thinks they're running errands. The kid thinks they're going on a walk. Nobody planned the handprints in wet cement. But the butterfly arranged the stepping stones, and the family walked across them.</p>
 
-        <blockquote class="fade-in">
-            <p>"You can go treasure hunting by following your instinct for the interesting, not because you know where you're going, but because you feel the potential in where you are right now."</p>
+        <blockquote class="fade-in has-image">
             <img class="butterfly-img" src="butterfly.jpg" alt="The Picbreeder butterfly — an image that emerged from non-objective collaborative evolution">
-            <p>"If you're wondering how to escape the myth of the objective, just do things because they're interesting. Not everything needs to be guided by rigid objectives. If you have a strong feeling, go with it."</p>
-            <span class="attribution">— Kenneth Stanley &amp; Joel Lehman, <em>Why Greatness Cannot Be Planned</em></span>
+            <div class="quote-text">
+                <p>"If you're wondering how to escape the myth of the objective, just do things because they're interesting. Not everything needs to be guided by rigid objectives. If you have a strong feeling, go with it."</p>
+                <span class="attribution">— Kenneth Stanley &amp; Joel Lehman, <a href="https://www.goodreads.com/book/show/25670869-why-greatness-cannot-be-planned" target="_blank" rel="noopener noreferrer"><em>Why Greatness Cannot Be Planned</em></a></span>
+            </div>
         </blockquote>
 
         <p class="fade-in">This is the pedagogy of The Answering Machine. There is no curriculum. There are no learning objectives. There is no assessment. There is a child, a question, and an AI that takes that question seriously enough to reshape a Thursday afternoon around it. Revealed curiosity as real-time curriculum.</p>
